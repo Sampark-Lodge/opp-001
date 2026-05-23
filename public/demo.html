@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Try InvoiceAI Demo — AI Invoice Processing</title>
+  <meta name="description" content="Paste any invoice text and see how InvoiceAI extracts structured data instantly. No signup required.">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">⟡</span>
+        <span class="logo-text">InvoiceAI</span>
+      </a>
+      <div class="nav-links">
+        <a href="/#features">Features</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="demo.html">Live Demo</a>
+        <a href="signup.html" class="nav-auth-link">Sign In</a>
+      </div>
+      <a href="signup.html" class="btn btn-primary nav-cta">Get Started</a>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <section class="page-demo demo-page-section">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:24px;">
+        <h1 style="font-size:2.4rem;margin-bottom:8px;">Live <span class="gradient-text">Demo</span></h1>
+        <p style="color:var(--text-muted);">Paste invoice text below, or try the sample. No signup needed.</p>
+      </div>
+
+      <div class="api-url-bar">
+        <strong>API:</strong> <span id="apiEndpoint">POST /parse</span>
+        <span style="float:right;color:var(--text-dim);font-size:0.8rem;">Response time: <span id="responseTime">—</span></span>
+      </div>
+
+      <div class="demo-container">
+        <div>
+          <label style="font-weight:600;font-size:0.9rem;color:var(--text-muted);display:block;margin-bottom:8px;">
+            Paste invoice text:
+          </label>
+          <textarea id="invoiceInput" class="demo-textarea" placeholder="Paste your invoice text here...&#10;&#10;Example:&#10;INVOICE&#10;Invoice #: INV-2024-0087&#10;Date: May 15, 2024&#10;Total: $7,376.92">INVOICE
+
+Invoice #: INV-2024-0087
+Date: May 15, 2024
+Due Date: June 15, 2024
+
+FROM:
+Acme Software Solutions LLC
+123 Tech Street, San Francisco, CA 94105
+billing@acmesoftware.com
+
+BILL TO:
+Johnson & Associates
+456 Business Ave, New York, NY 10001
+
+ITEMS:
+Web Development Services   40  @ $125.00    $5,000.00
+API Integration            8   @ $150.00    $1,200.00
+Monthly Hosting            1   @ $99.00     $99.00
+Technical Support          5   @ $100.00    $500.00
+
+                        Subtotal:    $6,799.00
+                        Tax (8.5%):  $577.92
+                        TOTAL DUE:   $7,376.92
+
+Payment Terms: Net 30
+Currency: USD</textarea>
+          <div class="demo-actions">
+            <button id="parseBtn" class="btn btn-primary">Parse Invoice →</button>
+            <button id="clearBtn" class="btn btn-outline">Clear</button>
+            <button id="sampleBtn" class="btn btn-outline">Load Sample</button>
+          </div>
+          <p style="color:var(--text-dim);font-size:0.8rem;margin-top:8px;">
+            Your text is processed in memory. Nothing is stored on our servers.
+          </p>
+        </div>
+
+        <div>
+          <label style="font-weight:600;font-size:0.9rem;color:var(--text-muted);display:block;margin-bottom:8px;">
+            Parsed Result:
+          </label>
+          <div id="resultArea" class="result-area">
+            <div id="resultEmpty" class="result-empty">
+              <div class="result-empty-icon">⟡</div>
+              <p>Click "Parse Invoice" to see results here</p>
+              <small style="color:var(--text-dim);">The AI extracts invoice number, dates, line items, totals, vendor, and client info.</small>
+            </div>
+            <div id="resultContent" style="display:none;">
+              <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+                <span id="resultStatus" class="result-status"></span>
+                <button id="copyJsonBtn" class="btn btn-outline" style="padding:6px 14px;font-size:0.8rem;">Copy JSON</button>
+              </div>
+              <div id="resultTableView"></div>
+              <hr style="border-color:var(--border);margin:16px 0;">
+              <pre id="resultJsonView" class="result-json"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">⟡</span>
+        <span class="logo-text">InvoiceAI</span>
+        <p>AI-powered invoice processing for modern small businesses.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="/#features">Features</a>
+          <a href="/#pricing">Pricing</a>
+          <a href="demo.html">Live Demo</a>
+          <a href="docs.html">API Docs</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="docs.html">Documentation</a>
+          <a href="demo.html">Interactive Demo</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 InvoiceAI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/demo.js"></script>
+</body>
+</html>

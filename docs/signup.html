@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — InvoiceAI</title>
+  <meta name="description" content="Create your InvoiceAI account. Start automating invoice processing with AI.">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .auth-page {
+      padding-top: 80px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      margin: 60px auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .auth-tabs {
+      display: flex;
+      background: var(--bg-elevated);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .auth-tab.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+    }
+    .auth-tab:hover:not(.active) {
+      color: var(--text);
+    }
+    .auth-panel {
+      display: none;
+    }
+    .auth-panel.active {
+      display: block;
+    }
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .form-group input {
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .form-group input::placeholder {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+    .auth-submit {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .auth-submit.loading .btn-text {
+      visibility: hidden;
+    }
+    .auth-submit.loading .btn-spinner {
+      display: inline-block;
+    }
+    .auth-error {
+      display: none;
+      padding: 10px 14px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      color: #ef4444;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    .auth-error.visible {
+      display: block;
+    }
+    .auth-extra {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .auth-extra a {
+      color: var(--primary-glow);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .auth-extra a:hover {
+      text-decoration: underline;
+    }
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0 8px;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .btn-spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      position: absolute;
+    }
+    .optional-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">⟡</span>
+        <span class="logo-text">InvoiceAI</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="demo.html">Demo</a>
+        <a href="docs.html">API Docs</a>
+      </div>
+      <a href="/#pricing" class="btn btn-primary nav-cta">Get Started</a>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <section class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome to <span class="gradient-text">InvoiceAI</span></h1>
+        <p>AI-powered invoice processing, simplified.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="signup">Sign Up</button>
+        <button class="auth-tab" data-tab="login">Login</button>
+      </div>
+
+      <div class="auth-panel active" id="panel-signup">
+        <form class="auth-form" id="signupForm" novalidate>
+          <div class="auth-error" id="signupError"></div>
+          <div class="form-group">
+            <label for="signupEmail">Email <span class="optional-label">*</span></label>
+            <input type="email" id="signupEmail" placeholder="you@company.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="signupPassword">Password <span class="optional-label">* (min 6 characters)</span></label>
+            <input type="password" id="signupPassword" placeholder="Create a password" minlength="6" required autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label for="signupName">Name <span class="optional-label">(optional)</span></label>
+            <input type="text" id="signupName" placeholder="Your name" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="signupCompany">Company <span class="optional-label">(optional)</span></label>
+            <input type="text" id="signupCompany" placeholder="Company name" autocomplete="organization">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full auth-submit" id="signupSubmit">
+            <span class="btn-text">Create Account</span>
+            <span class="btn-spinner"></span>
+          </button>
+        </form>
+      </div>
+
+      <div class="auth-panel" id="panel-login">
+        <form class="auth-form" id="loginForm" novalidate>
+          <div class="auth-error" id="loginError"></div>
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="you@company.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full auth-submit" id="loginSubmit">
+            <span class="btn-text">Sign In</span>
+            <span class="btn-spinner"></span>
+          </button>
+        </form>
+      </div>
+
+      <div class="auth-extra">
+        <a href="demo.html">Try the live demo first →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">⟡</span>
+        <span class="logo-text">InvoiceAI</span>
+        <p>AI-powered invoice processing for modern small businesses.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="/#features">Features</a>
+          <a href="/#pricing">Pricing</a>
+          <a href="demo.html">Live Demo</a>
+          <a href="docs.html">API Docs</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="docs.html">Documentation</a>
+          <a href="demo.html">Interactive Demo</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 InvoiceAI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/signup.js"></script>
+</body>
+</html>

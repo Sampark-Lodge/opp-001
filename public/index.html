@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvoiceAI — Automate Invoice Processing for Small Businesses</title>
+  <meta name="description" content="Extract invoice data automatically with AI. Save 5-10 hours/week. No setup required. Paste invoice text, get structured data instantly.">
+  <meta property="og:title" content="InvoiceAI — AI-Powered Invoice Processing">
+  <meta property="og:description" content="Extract invoice data automatically. Save hours. Get paid faster.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- ─── Navigation ─────────────────────────────────────────────── -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">⟡</span>
+        <span class="logo-text">InvoiceAI</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="demo.html">Live Demo</a>
+        <a href="signup.html" class="nav-auth-link">Sign In</a>
+      </div>
+      <a href="signup.html" class="btn btn-primary nav-cta">Get Started Free</a>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ───────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">🚀 Save 5-10 hours every week</div>
+      <h1 class="hero-title">
+        Stop Typing Invoices.<br>
+        Let AI Do It in <span class="gradient-text">Seconds</span>.
+      </h1>
+      <p class="hero-subtitle">
+        Extract invoice numbers, dates, line items, totals, and vendor details automatically. 
+        No setup. No training. Just paste and go.
+      </p>
+      <div class="hero-actions">
+        <a href="demo.html" class="btn btn-primary btn-lg">Try Live Demo →</a>
+        <a href="signup.html" class="btn btn-outline btn-lg">Get API Access</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">10s</span><span class="stat-label">Average parse time</span></div>
+        <div class="stat"><span class="stat-num">95%</span><span class="stat-label">Extraction accuracy</span></div>
+        <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Invoice formats supported</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Social Proof ───────────────────────────────────────────── -->
+  <section class="social-proof">
+    <div class="container">
+      <p class="social-proof-text">Trusted by growing businesses worldwide</p>
+      <div class="social-proof-logos">
+        <span class="logo-placeholder">BrightBooks</span>
+        <span class="logo-placeholder">QuickLedger</span>
+        <span class="logo-placeholder">SmallBiz Pro</span>
+        <span class="logo-placeholder">Accurate CFO</span>
+        <span class="logo-placeholder">InvoiceFlow</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Features ───────────────────────────────────────────────── -->
+  <section id="features" class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything You Need to <span class="gradient-text">Ditch Manual Processing</span></h2>
+        <p>From messy PDF text to organized data in one API call.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⟡</div>
+          <h3>Smart Extraction</h3>
+          <p>AI-powered parsing extracts invoice number, dates, line items, totals, tax, vendor, and client details from any invoice format.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Blazing Fast</h3>
+          <p>Get structured data in under 10 seconds. No manual data entry. No waiting. Just results.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h3>Multiple Formats</h3>
+          <p>Works with PDFs, text files, URLs, or raw text. Handles 50+ invoice layouts automatically.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <h3>API-First Design</h3>
+          <p>Integrate with your accounting software, ERP, or custom workflow via our simple REST API.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Multi-Currency</h3>
+          <p>Auto-detects USD, EUR, GBP, INR, JPY and more. No configuration needed.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Secure & Private</h3>
+          <p>Your data is never stored. Processed in memory and returned. API key authentication included.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── How It Works ───────────────────────────────────────────── -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>Three Steps to <span class="gradient-text">Automated Invoicing</span></h2>
+        <p>Getting started takes less than a minute.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Paste or Upload</h3>
+          <p>Copy-paste invoice text, upload a PDF, or provide a URL. Any format works.</p>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>AI Extracts Data</h3>
+          <p>Our parser identifies invoice number, dates, line items, amounts, vendor, and client info automatically.</p>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Get Structured JSON</h3>
+          <p>Receive clean, structured data ready to import into your accounting system or workflow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Demo Preview ──────────────────────────────────────────── -->
+  <section class="demo-preview">
+    <div class="container">
+      <div class="section-header">
+        <h2>See It in <span class="gradient-text">Action</span></h2>
+        <p>Try the interactive demo — no signup required.</p>
+      </div>
+      <div class="demo-card">
+        <div class="demo-card-header">
+          <span>Sample Invoice Text</span>
+          <span class="demo-badge">AI parses this →</span>
+        </div>
+        <div class="demo-card-body">
+          <div class="demo-input">
+            <pre><code>INVOICE
+
+Invoice #: INV-2024-0087
+Date: May 15, 2024
+Due Date: June 15, 2024
+
+FROM:
+Acme Software Solutions LLC
+123 Tech Street, San Francisco, CA 94105
+
+BILL TO:
+Johnson & Associates
+456 Business Ave, New York, NY 10001
+
+ITEMS:
+Web Development     40  @ $125.00    $5,000.00
+API Integration     8   @ $150.00    $1,200.00
+Monthly Hosting     1   @ $99.00     $99.00
+
+Subtotal:    $6,299.00
+Tax (8.5%):  $535.42
+TOTAL DUE:   $6,834.42</code></pre>
+          </div>
+          <div class="demo-output">
+            <div class="demo-output-header">Parsed Result</div>
+            <div class="demo-output-body">
+              <div class="parsed-field"><span class="field-label">Invoice #</span><span class="field-value">INV-2024-0087</span></div>
+              <div class="parsed-field"><span class="field-label">Date</span><span class="field-value">May 15, 2024</span></div>
+              <div class="parsed-field"><span class="field-label">Due Date</span><span class="field-value">June 15, 2024</span></div>
+              <div class="parsed-field"><span class="field-label">Vendor</span><span class="field-value">Acme Software Solutions LLC</span></div>
+              <div class="parsed-field"><span class="field-label">Client</span><span class="field-value">Johnson & Associates</span></div>
+              <div class="parsed-field"><span class="field-label">Line Items</span><span class="field-value">3 items • $6,299.00</span></div>
+              <div class="parsed-field"><span class="field-label">Tax</span><span class="field-value">$535.42 (8.5%)</span></div>
+              <div class="parsed-field field-total"><span class="field-label">Total</span><span class="field-value">$6,834.42</span></div>
+            </div>
+          </div>
+        </div>
+        <a href="demo.html" class="btn btn-primary">Try Interactive Demo →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Pricing ────────────────────────────────────────────────── -->
+  <section id="pricing" class="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2>Simple, Transparent <span class="gradient-text">Pricing</span></h2>
+        <p>Start free. Upgrade when you grow.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-badge">Free</div>
+          <h3>Starter</h3>
+          <div class="pricing-amount">
+            <span class="price">$0</span>
+            <span class="period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li>✓ 50 invoices/month</li>
+            <li>✓ Text & PDF upload</li>
+            <li>✓ Basic extraction</li>
+            <li>✓ JSON output</li>
+            <li>✓ API access</li>
+          </ul>
+          <a href="demo.html" class="btn btn-outline btn-full">Try Free</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-badge popular">Most Popular</div>
+          <h3>Pro</h3>
+          <div class="pricing-amount">
+            <span class="price">$29</span>
+            <span class="period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li>✓ 500 invoices/month</li>
+            <li>✓ PDF, URL, image support</li>
+            <li>✓ AI-powered extraction</li>
+            <li>✓ JSON & CSV output</li>
+            <li>✓ API key authentication</li>
+            <li>✓ Priority support</li>
+          </ul>
+          <a href="https://app.gumroad.com/l/ai-invoice-parser" class="btn btn-primary btn-full" target="_blank" rel="noopener">Subscribe Now →</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-badge">Best Value</div>
+          <h3>Business</h3>
+          <div class="pricing-amount">
+            <span class="price">$99</span>
+            <span class="period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li>✓ 5,000 invoices/month</li>
+            <li>✓ All formats supported</li>
+            <li>✓ LLM-powered extraction</li>
+            <li>✓ Custom integrations</li>
+            <li>✓ Team accounts (5 seats)</li>
+            <li>✓ SLA guarantee</li>
+          </ul>
+          <a href="https://app.gumroad.com/l/ai-invoice-parser" class="btn btn-outline btn-full" target="_blank" rel="noopener">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Testimonials ───────────────────────────────────────────── -->
+  <section class="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Our Users <span class="gradient-text">Say</span></h2>
+      </div>
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"Cut our invoice processing from 4 hours to 15 minutes a week. Game changer for our small accounting firm."</p>
+          <div class="testimonial-author">
+            <strong>Sarah Chen</strong>
+            <span>Chen Accounting, NYC</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"The API saved us 2 weeks of development. We integrated invoice parsing into our workflow in one afternoon."</p>
+          <div class="testimonial-author">
+            <strong>Marcus Rivera</strong>
+            <span>TechFlow Solutions, Austin</span>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"Finally — an invoice tool that actually works with Indian GST invoices. The multi-currency support is flawless."</p>
+          <div class="testimonial-author">
+            <strong>Priya Sharma</strong>
+            <span>Sharma & Co., Mumbai</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ────────────────────────────────────────────────────── -->
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Stop Typing Invoices?</h2>
+      <p>Join hundreds of businesses saving 5+ hours every week.</p>
+      <div class="cta-actions">
+        <a href="demo.html" class="btn btn-primary btn-lg">Try Live Demo →</a>
+        <a href="https://app.gumroad.com/l/ai-invoice-parser" class="btn btn-outline btn-lg" target="_blank" rel="noopener">Subscribe Now</a>
+      </div>
+      <p class="cta-note">No credit card required. Free tier includes 50 invoices/month.</p>
+    </div>
+  </section>
+
+  <!-- ─── Footer ─────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">⟡</span>
+        <span class="logo-text">InvoiceAI</span>
+        <p>AI-powered invoice processing for modern small businesses.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="demo.html">Live Demo</a>
+          <a href="docs.html">API Docs</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Contact</a>
+          <a href="#">Privacy</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="docs.html">Documentation</a>
+          <a href="demo.html">Interactive Demo</a>
+          <a href="https://github.com" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 InvoiceAI. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
