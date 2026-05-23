@@ -326,6 +326,48 @@
     </div>
   </footer>
 
+  <!-- Upgrade Subscription Modal -->
+  <div id="upgradeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-family: 'Inter', sans-serif;">
+      <h3 style="margin-top: 0; margin-bottom: 10px; color: #f8fafc; font-size: 1.25rem;">Upgrade Subscription</h3>
+      <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 24px; line-height: 1.5;">Choose a premium plan and pay via PayU Hosted Checkout.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+        <!-- Starter Plan -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px;">
+          <div>
+            <div style="font-weight: 600; color: #f8fafc; font-size: 0.95rem;">Starter Plan</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">500 API calls/month</div>
+          </div>
+          <button onclick="window.payWithPayU('starter')" style="padding: 8px 16px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-family: inherit; font-weight: 600; cursor: pointer;">Pay ₹999</button>
+        </div>
+        
+        <!-- Business Plan -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background: #0f172a; border: 1.5px solid #6366f1; border-radius: 8px; position: relative;">
+          <div style="position: absolute; top: -10px; right: 14px; background: #6366f1; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 700;">POPULAR</div>
+          <div>
+            <div style="font-weight: 600; color: #f8fafc; font-size: 0.95rem;">Business Plan</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">3,000 API calls/month</div>
+          </div>
+          <button onclick="window.payWithPayU('business')" style="padding: 8px 16px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-family: inherit; font-weight: 600; cursor: pointer;">Pay ₹2,499</button>
+        </div>
+        
+        <!-- Enterprise Plan -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px;">
+          <div>
+            <div style="font-weight: 600; color: #f8fafc; font-size: 0.95rem;">Enterprise Plan</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">15,000 API calls/month</div>
+          </div>
+          <button onclick="window.payWithPayU('enterprise')" style="padding: 8px 16px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-family: inherit; font-weight: 600; cursor: pointer;">Pay ₹7,999</button>
+        </div>
+      </div>
+      
+      <div style="display: flex; justify-content: flex-end;">
+        <button id="closeUpgradeBtn" style="padding: 8px 16px; border: 1px solid #334155; border-radius: 6px; background: transparent; color: #94a3b8; cursor: pointer; font-family: inherit;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/dashboard.js"></script>
 </body>
 </html>

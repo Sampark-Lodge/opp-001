@@ -303,12 +303,77 @@
       var menu = $('userDropdownMenu');
       if (menu) menu.classList.remove('active');
     }
+    
+    // Upgrade modal trigger interceptor
+    if (e.target.id === 'openUpgradeModalBtn' || e.target.id === 'openUpgradeModalBtnNav' || (e.target.href && e.target.href.indexOf('pricing.html') !== -1)) {
+      e.preventDefault();
+      var upgradeModal = $('upgradeModal');
+      if (upgradeModal) upgradeModal.style.display = 'flex';
+    }
   });
 
-  qs('.nav-toggle').addEventListener('click', function () {
-    qs('.nav-links').classList.toggle('active');
-    qs('.nav-cta').classList.toggle('active');
-  });
+  var closeUpgradeBtn = $('closeUpgradeBtn');
+  if (closeUpgradeBtn) {
+    closeUpgradeBtn.addEventListener('click', function () {
+      var upgradeModal = $('upgradeModal');
+      if (upgradeModal) upgradeModal.style.display = 'none';
+    });
+  }
+
+  window.payWithPayU = function (planId) {
+    hideError();
+    var upgradeModal = $('upgradeModal');
+    if (upgradeModal) upgradeModal.style.display = 'none';
+
+    api('/api/payment/payu-hash', {
+      method: 'POST',
+      body: {
+        planId: planId,
+        firstname: userData.name || 'Customer',
+        email: userData.email
+      }
+    }).then(function (data) {
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = data.actionUrl;
+
+      var params = {
+        key: data.key,
+        txnid: data.txnid,
+        amount: data.amount,
+        productinfo: data.productinfo,
+        firstname: data.firstname,
+        email: data.email,
+        hash: data.hash,
+        surl: data.surl,
+        furl: data.furl
+      };
+
+      for (var k in params) {
+        if (params.hasOwnProperty(k)) {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = k;
+          input.value = params[k];
+          form.appendChild(input);
+        }
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+    }).catch(function (err) {
+      showError('Failed to initiate PayU payment: ' + err.message);
+    });
+  };
+
+  var toggle = qs('.nav-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      qs('.nav-links').classList.toggle('active');
+      var cta = qs('.nav-cta');
+      if (cta) cta.classList.toggle('active');
+    });
+  }
 
   els.statsTotal = $('statsTotal');
   els.stats24h = $('stats24h');
@@ -323,6 +388,24 @@
   els.userName = $('userName');
 
   hideError();
+  
+  // Check for payment status in URL query parameters
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('payment')) {
+    var paymentStatus = urlParams.get('payment');
+    if (paymentStatus === 'success') {
+      showError('Payment successful! Your premium subscription has been activated.');
+      var errEl = $('errorMessage');
+      if (errEl) {
+        errEl.style.background = 'rgba(16, 185, 129, 0.1)';
+        errEl.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        errEl.style.color = '#10b981';
+      }
+    } else {
+      showError('Payment failed. Please try again or contact support.');
+    }
+  }
+
   loadStats();
   loadApiKeys();
 })();

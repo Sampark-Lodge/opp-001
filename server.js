@@ -30,6 +30,7 @@ const RATE_LIMIT_MAX_PAID = 120;             // 120 req/min for paid
 // ─── Middleware ────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Track API response time
 app.use((req, res, next) => {
@@ -249,6 +250,73 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// ─── POST /api/auth/google ────────────────────────────────────────────────
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential, email, name } = req.body;
+    let userEmail = email;
+    let userName = name;
+
+    if (credential) {
+      const parts = credential.split('.');
+      if (parts.length === 3) {
+        try {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+          userEmail = payload.email;
+          userName = payload.name;
+        } catch (e) {
+          console.error('[Google Auth] JWT decode failed:', e.message);
+        }
+      }
+    }
+
+    if (!userEmail) {
+      return res.status(400).json({ error: 'Google email is required' });
+    }
+
+    let user = db.prepare('SELECT * FROM users WHERE email = ?').get(userEmail);
+    let userId;
+    
+    if (!user) {
+      const result = db.prepare(
+        'INSERT INTO users (email, password_hash, name, company) VALUES (?, ?, ?, ?)'
+      ).run(userEmail, 'GOOGLE_AUTH_NO_PASSWORD', userName || null, null);
+      userId = result.lastInsertRowid;
+
+      // Create a default API key
+      const apiKey = generateApiKey();
+      db.prepare('INSERT INTO api_keys (user_id, key, label) VALUES (?, ?, ?)').run(userId, apiKey, 'Default');
+
+      // Create a free subscription
+      db.prepare('INSERT INTO subscriptions (user_id, plan, status) VALUES (?, ?, ?)').run(userId, 'free', 'active');
+      
+      user = { id: userId, email: userEmail, name: userName };
+    } else {
+      userId = user.id;
+    }
+
+    const sub = db.prepare('SELECT plan, status FROM subscriptions WHERE user_id = ?').get(userId);
+    const keys = db.prepare('SELECT key FROM api_keys WHERE user_id = ?').all(userId);
+    const token = createToken({ id: userId, email: userEmail });
+
+    res.json({
+      token,
+      user: {
+        id: userId,
+        email: userEmail,
+        name: user.name || userName,
+        company: user.company || null,
+        plan: sub ? sub.plan : 'free'
+      },
+      apiKey: keys.length > 0 ? keys[0].key : null
+    });
+
+  } catch (err) {
+    console.error('[Google Auth] Error:', err.message);
+    res.status(500).json({ error: 'Google authentication failed' });
+  }
+});
+
 // ─── GET /api/auth/me ─────────────────────────────────────────────────────
 app.get('/api/auth/me', authenticateJWT, (req, res) => {
   const sub = db.prepare('SELECT plan, status FROM subscriptions WHERE user_id = ?').get(req.user.id);
@@ -377,123 +445,121 @@ app._parseHandler = async (req, res) => {
 app.post('/api/parse/text', app._parseHandler);
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  PAYMENT ENDPOINTS (Razorpay)
+//  PAYMENT ENDPOINTS (PayU Hosted Checkout)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
+const PAYU_KEY = 'mRBVHL';
+const PAYU_SALT = 'gauLq9k3h4WG7jxryLGCH2TpXq7KlTe6';
+const PAYU_ACTION_URL = 'https://test.payu.in/_payment';
 
 // ─── GET /api/payment/config ──────────────────────────────────────────────
 app.get('/api/payment/config', authenticateJWT, (req, res) => {
   res.json({
-    key: RAZORPAY_KEY_ID,
+    key: PAYU_KEY,
+    actionUrl: PAYU_ACTION_URL,
     plans: [
-      { id: 'starter',  name: 'Starter',  price: 999,  period: 'month', apiLimit: 500 },
-      { id: 'business', name: 'Business', price: 2499, period: 'month', apiLimit: 3000, highlighted: true },
-      { id: 'enterprise', name: 'Enterprise', price: 7999, period: 'month', apiLimit: 15000 }
+      { id: 'starter',  name: 'Starter Plan',  price: 999,  period: 'month', apiLimit: 500 },
+      { id: 'business', name: 'Business Plan', price: 2499, period: 'month', apiLimit: 3000, highlighted: true },
+      { id: 'enterprise', name: 'Enterprise Plan', price: 7999, period: 'month', apiLimit: 15000 }
     ]
   });
 });
 
-// ─── POST /api/payment/create-order ───────────────────────────────────────
-app.post('/api/payment/create-order', authenticateJWT, async (req, res) => {
+// ─── POST /api/payment/payu-hash ──────────────────────────────────────────
+app.post('/api/payment/payu-hash', authenticateJWT, (req, res) => {
   try {
-    if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-      return res.status(503).json({ error: 'Payments not configured. Contact support.' });
-    }
-
-    const { planId } = req.body;
+    const { planId, firstname, email } = req.body;
+    
     const plans = {
-      starter:    { amount: 999,  currency: 'INR' },
-      business:   { amount: 2499, currency: 'INR' },
-      enterprise: { amount: 7999, currency: 'INR' }
+      starter:    999,
+      business:   2499,
+      enterprise: 7999
     };
 
-    const plan = plans[planId];
-    if (!plan) {
+    const amount = plans[planId];
+    if (!amount) {
       return res.status(400).json({ error: 'Invalid plan ID. Use: starter, business, or enterprise' });
     }
 
-    // Create order via Razorpay API
-    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
-    const response = await fetch('https://api.razorpay.com/v1/orders', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        amount: plan.amount * 100,  // Razorpay expects paise
-        currency: plan.currency,
-        receipt: `order_${req.user.id}_${Date.now()}`,
-        notes: { userId: String(req.user.id), planId }
-      })
-    });
+    const txnid = 'tx_' + uuidv4().replace(/-/g, '').substring(0, 18);
+    const productinfo = `InvoiceAI ${planId} Subscription`;
+    const userFirstname = firstname || req.user.name || 'Customer';
+    const userEmail = email || req.user.email;
 
-    const order = await response.json();
+    // Generate hash: sha512(key|txnid|amount|productinfo|firstname|email|||||||||salt)
+    const hashString = `${PAYU_KEY}|${txnid}|${amount}|${productinfo}|${userFirstname}|${userEmail}|||||||||||${PAYU_SALT}`;
+    const hash = crypto.createHash('sha512').update(hashString).digest('hex');
 
-    if (!response.ok) {
-      throw new Error(order.error?.description || 'Razorpay order creation failed');
-    }
+    // Resolve protocol and host for callback URLs
+    const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const host = req.headers.host;
+    const callbackBase = `${protocol}://${host}`;
 
-    // Save order reference
+    // Record transaction ID (reusing razorpay_order_id)
     db.prepare('UPDATE subscriptions SET razorpay_order_id = ?, plan = ? WHERE user_id = ?')
-      .run(order.id, planId, req.user.id);
+      .run(txnid, planId, req.user.id);
 
     res.json({
-      order: {
-        id: order.id,
-        amount: order.amount,
-        currency: order.currency
-      }
+      key: PAYU_KEY,
+      txnid,
+      amount,
+      productinfo,
+      firstname: userFirstname,
+      email: userEmail,
+      hash,
+      actionUrl: PAYU_ACTION_URL,
+      surl: `${callbackBase}/api/payu/success`,
+      furl: `${callbackBase}/api/payu/failure`
     });
 
   } catch (err) {
-    console.error('[Payment] Create order error:', err.message);
-    res.status(500).json({ error: 'Failed to create payment order' });
+    console.error('[Payment] Hash generation error:', err.message);
+    res.status(500).json({ error: 'Failed to prepare payment hash' });
   }
 });
 
-// ─── POST /api/payment/verify ─────────────────────────────────────────────
-app.post('/api/payment/verify', authenticateJWT, (req, res) => {
+// ─── POST /api/payu/success (PayU callback) ──────────────────────────────
+app.post('/api/payu/success', (req, res) => {
   try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    const { txnid } = req.body;
+    console.log('[PayU Success] Callback received for TXN:', txnid);
 
-    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-      return res.status(400).json({ error: 'Missing payment verification fields' });
+    // Find user by transaction ID
+    const sub = db.prepare('SELECT user_id, plan FROM subscriptions WHERE razorpay_order_id = ?').get(txnid);
+    if (!sub) {
+      console.error('[PayU Success] Transaction ID not found in database:', txnid);
+      return res.redirect('/dashboard.html?payment=failed&reason=txn_not_found');
     }
 
-    // Verify signature
-    const body = razorpay_order_id + '|' + razorpay_payment_id;
-    const expectedSig = crypto
-      .createHmac('sha256', RAZORPAY_KEY_SECRET)
-      .update(body)
-      .digest('hex');
-
-    if (expectedSig !== razorpay_signature) {
-      return res.status(400).json({ error: 'Invalid payment signature' });
-    }
-
-    // Update subscription
+    const userId = sub.user_id;
     const now = new Date();
     const periodEnd = new Date(now);
     periodEnd.setDate(periodEnd.getDate() + 30);
 
+    // Activate subscription
     db.prepare(`
       UPDATE subscriptions
       SET status = 'active', razorpay_payment_id = ?, current_period_start = ?, current_period_end = ?, updated_at = datetime('now')
       WHERE user_id = ?
-    `).run(razorpay_payment_id, now.toISOString(), periodEnd.toISOString(), req.user.id);
+    `).run(txnid, now.toISOString(), periodEnd.toISOString(), userId);
 
-    res.json({
-      success: true,
-      message: 'Payment verified and subscription activated',
-      validUntil: periodEnd.toISOString()
-    });
+    res.redirect('/dashboard.html?payment=success');
 
   } catch (err) {
-    console.error('[Payment] Verify error:', err.message);
-    res.status(500).json({ error: 'Payment verification failed' });
+    console.error('[PayU Success] Error handling success callback:', err.message);
+    res.redirect('/dashboard.html?payment=failed');
+  }
+});
+
+// ─── POST /api/payu/failure (PayU callback) ──────────────────────────────
+app.post('/api/payu/failure', (req, res) => {
+  try {
+    const { txnid } = req.body;
+    console.log('[PayU Failure] Callback received for TXN:', txnid);
+    res.redirect('/dashboard.html?payment=failed');
+  } catch (err) {
+    console.error('[PayU Failure] Error handling failure callback:', err.message);
+    res.redirect('/dashboard.html?payment=failed');
   }
 });
 
