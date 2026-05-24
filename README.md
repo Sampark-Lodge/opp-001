@@ -2,15 +2,23 @@
   <br/>
   <h1>⟡ InvoiceAI</h1>
   <p><strong>AI-Powered Invoice Processing for Small Businesses</strong></p>
+  <p><em>Product ID: opp-001</em></p>
   <p>Extract structured invoice data in seconds — no setup, no training, just paste and go.</p>
   <br/>
   <p>
     <a href="#features">Features</a> •
+    <a href="#demo">Live Demo</a> •
     <a href="#tech-stack">Tech Stack</a> •
     <a href="#getting-started">Getting Started</a> •
-    <a href="#google-authentication">Google Auth</a> •
-    <a href="#payu-integration">PayU Payments</a> •
-    <a href="#api">API</a>
+    <a href="#api">API</a> •
+    <a href="#deployment">Deployment</a> •
+    <a href="#contributing">Contributing</a>
+  </p>
+  <br/>
+  <p>
+    <img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen" alt="Node version"/>
+    <img src="https://img.shields.io/badge/license-MIT-blue" alt="License"/>
+    <img src="https://img.shields.io/badge/status-beta-yellow" alt="Status"/>
   </p>
   <br/>
 </div>
@@ -19,7 +27,7 @@
 
 ## Overview
 
-**InvoiceAI** replaces manual invoice data entry with AI-driven extraction. Small businesses, freelancers, and accountants can paste invoice text — or send them via API — and receive clean, structured JSON with invoice numbers, dates, line items, totals, vendor details, and more. What used to take 5–10 hours per week now happens in under 10 seconds.
+**InvoiceAI** replaces manual invoice data entry with AI-driven extraction. Small businesses, freelancers, and accountants can paste invoice text — or send them via API — and receive clean, structured JSON with invoice numbers, dates, line items, totals, vendor details, and more. What used to take 5–10 hours per week now happens in **under 10 seconds**.
 
 The platform includes a landing page, interactive live demo, full REST API with documentation, user authentication (email + Google), API key management, usage tracking, and tiered subscription billing via PayU.
 
@@ -37,7 +45,32 @@ The platform includes a landing page, interactive live demo, full REST API with 
 | **Usage Dashboard** | Real-time parse history, rate limits, and API consumption |
 | **Tiered Subscriptions** | Free, Starter (₹999/mo), Business (₹2,499/mo), Enterprise (₹7,999/mo) |
 | **PayU Billing** | Secure hosted checkout with hash-verified transactions |
-| **Rate Limiting** | 10 req/min (free), 500–15,000 req/mo (paid) |
+| **Rate Limiting** | 10 req/min (free), 500–15,000 req/mo (paid plans) |
+
+---
+
+## Demo
+
+Try the live parser instantly at [**`/demo`**](demo.html) — no account required. Paste any invoice text and see structured JSON output in real time.
+
+```json
+// Input: raw invoice text
+{
+  "invoice_number": "INV-2024-0042",
+  "date": "2024-03-15",
+  "due_date": "2024-04-14",
+  "vendor": {
+    "name": "Acme Corp",
+    "address": "123 Business Ave, Suite 200"
+  },
+  "line_items": [
+    { "description": "Web Development", "quantity": 40, "rate": 150, "amount": 6000 }
+  ],
+  "subtotal": 6000,
+  "tax": 600,
+  "total": 6600
+}
+```
 
 ---
 
@@ -49,7 +82,7 @@ The platform includes a landing page, interactive live demo, full REST API with 
 |---|---|
 | **Backend** | Node.js — Express 4 |
 | **Database** | SQLite (via `better-sqlite3`) |
-| **Auth** | JWT (`jsonwebtoken`) + bcrypt + Google Identity Services |
+| **Authentication** | JWT (`jsonwebtoken`) + bcrypt + Google Identity Services |
 | **Payments** | PayU Hosted Checkout (test mode) |
 | **Frontend** | HTML / CSS / Vanilla JavaScript |
 | **Typography** | Inter (Google Fonts) |
@@ -63,8 +96,8 @@ The platform includes a landing page, interactive live demo, full REST API with 
 
 ### Prerequisites
 
-- Node.js >= 18.0.0
-- npm
+- [Node.js](https://nodejs.org/) >= 18.0.0
+- npm (ships with Node.js)
 
 ### Installation
 
@@ -78,7 +111,7 @@ npm install
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your settings (see below)
+# Edit .env with your settings (see Configuration below)
 
 # Start the server
 npm start        # production
@@ -94,300 +127,185 @@ The server starts on `http://localhost:3100` by default.
 | `PORT` | No | `3100` | Server listen port |
 | `API_URL` | No | — | Optional backend API URL for demo page endpoint display |
 
-Additional variables are configured directly in `server.js` for JWT secret and payment keys (see configuration sections below).
-
----
-
-## Google Authentication
-
-InvoiceAI uses **Google Identity Services** (GIS) for one-tap sign-in. The flow is client-side credential retrieval with server-side verification.
-
-### How It Works
-
-1. The frontend loads Google's GIS library and displays a **"Continue with Google"** button.
-2. On click, Google shows the account chooser / one-tap prompt.
-3. Google returns a credential JWT containing the user's email, name, and profile info.
-4. The frontend sends the credential to `POST /api/auth/google`.
-5. The backend decodes the JWT payload (server-side), extracts the email, and either:
-   - **New user**: Creates an account, generates a default API key, assigns a free subscription, and returns a session JWT.
-   - **Existing user**: Signs the user in and returns their existing data.
-6. The client stores the JWT token, user info, and API key in `localStorage` and redirects to the dashboard.
-
-### Configuration
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com).
-2. Create a project (or select existing).
-3. Navigate to **APIs & Services → Credentials**.
-4. Click **Create Credentials → OAuth 2.0 Client ID**.
-5. Set **Application type** to **Web application**.
-6. Add your domain to **Authorized JavaScript origins** (e.g., `http://localhost:3100`).
-7. Add your callback URIs if needed (GIS uses redirect-less flow, but origins must be whitelisted).
-8. Copy the **Client ID**.
-
-### Frontend Setup
-
-In your HTML (see `signup.html`), include the GIS library where `YOUR_CLIENT_ID` is the ID from step 8:
-
-```html
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-```
-
-Initialize the Google Sign-In button:
-
-```html
-<button id="googleCustomBtn" class="btn btn-secondary btn-full"
-        style="display:flex;align-items:center;justify-content:center;gap:10px;">
-  <svg width="20" height="20" viewBox="0 0 24 24">...Google icon...</svg>
-  <span class="btn-text">Continue with Google</span>
-</button>
-```
-
-JavaScript callback registration:
-
-```javascript
-window.handleCredentialResponse = function (response) {
-  fetch('/api/auth/google', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ credential: response.credential })
-  })
-    .then(res => res.json())
-    .then(data => {
-      localStorage.setItem('iai_token', data.token);
-      window.location.href = 'dashboard.html';
-    });
-};
-```
-
-The client ID is passed via the `data-client_id` attribute or `google.accounts.id.initialize()` call (the project currently uses a custom button with `google.accounts.id.prompt()` fallback — see `public/js/signup.js` for the complete implementation).
-
-### Backend Endpoint
-
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/api/auth/google` | Accepts `{ credential }` (Google JWT) or `{ email, name }` (mock/dev fallback) |
-
-**Response:**
-
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": {
-    "id": 1,
-    "email": "user@gmail.com",
-    "name": "Jane Doe",
-    "company": null,
-    "plan": "free"
-  },
-  "apiKey": "iai_abc123..."
-}
-```
-
----
-
-## PayU Integration
-
-InvoiceAI uses **PayU Hosted Checkout** (test mode) for subscription payments. The integration follows PayU's hash-based verification flow.
-
-### Configuration
-
-PayU credentials are configured in `server.js`:
-
-```javascript
-const PAYU_KEY  = 'mRBVHL';                        // Test Merchant Key
-const PAYU_SALT = 'gauLq9k3h4WG7jxryLGCH2TpXq7KlTe6';  // Test Salt
-const PAYU_ACTION_URL = 'https://test.payu.in/_payment';
-```
-
-> ⚠️ **Test Mode:** The above key and salt are for PayU's test environment. Replace with live credentials before production deployment.
-
-### Payment Flow
-
-```
-Client                         Server                         PayU
-  │                              │                              │
-  │  1. GET /api/payment/config  │                              │
-  │─────────────────────────────►│                              │
-  │◄── { key, plans, actionUrl } │                              │
-  │                              │                              │
-  │  2. POST /api/payment/payu-hash                             │
-  │     { planId, firstname, email }                            │
-  │─────────────────────────────►│                              │
-  │                              │  3. Generate SHA-512 hash    │
-  │                              │     key|txnid|amount|...|salt│
-  │◄── { hash, txnid, surl,     │                              │
-  │      furl, actionUrl }       │                              │
-  │                              │                              │
-  │  4. Auto-submit form to      │                              │
-  │     https://test.payu.in/_payment                           │
-  │──────────────────────────────────────────────────────────►  │
-  │                              │                              │
-  │  5. PayU processes payment   │                              │
-  │                              │                              │
-  │  6. PayU POSTs to /api/payu/success  OR  /api/payu/failure │
-  │                              │◄─────────────────────────────│
-  │                              │                              │
-  │  7. Redirect to              │                              │
-  │     dashboard.html?payment=success|failed                   │
-  │◄─────────────────────────────│                              │
-```
-
-### Hash Generation
-
-The hash is a SHA-512 of the concatenated string:
-
-```
-key|txnid|amount|productinfo|firstname|email|||||||||||salt
-```
-
-Implemented in `server.js`:
-
-```javascript
-const hashString = `${PAYU_KEY}|${txnid}|${amount}|${productinfo}|${userFirstname}|${userEmail}|||||||||||${PAYU_SALT}`;
-const hash = crypto.createHash('sha512').update(hashString).digest('hex');
-```
-
-### API Endpoints
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| `GET` | `/api/payment/config` | JWT | Returns merchant key, action URL, and available plans |
-| `POST` | `/api/payment/payu-hash` | JWT | Generates transaction hash for a given plan |
-| `POST` | `/api/payu/success` | — | PayU success callback — activates subscription |
-| `POST` | `/api/payu/failure` | — | PayU failure callback — redirects with error |
-
-### Plans
-
-| Plan ID | Price (₹/mo) | API Limit (req/mo) |
-|---|---|---|
-| `starter` | 999 | 500 |
-| `business` | 2,499 | 3,000 |
-| `enterprise` | 7,999 | 15,000 |
-
-### Client-Side Usage
-
-```javascript
-// Fetch payment config
-const config = await fetch('/api/payment/config', {
-  headers: { Authorization: `Bearer ${token}` }
-}).then(r => r.json());
-
-// Get hash for selected plan
-const { hash, txnid, actionUrl, surl, furl } = await fetch('/api/payment/payu-hash', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-  body: JSON.stringify({ planId: 'business' })
-}).then(r => r.json());
-
-// Build and submit PayU form
-const form = document.createElement('form');
-form.method = 'POST';
-form.action = actionUrl;
-form.innerHTML = `
-  <input name="key" value="${config.key}">
-  <input name="txnid" value="${txnid}">
-  <input name="amount" value="${hash.amount}">
-  <input name="productinfo" value="${hash.productinfo}">
-  <input name="firstname" value="${hash.firstname}">
-  <input name="email" value="${hash.email}">
-  <input name="hash" value="${hash.hash}">
-  <input name="surl" value="${surl}">
-  <input name="furl" value="${furl}">
-`;
-form.submit();
-```
+Additional secrets (JWT secret, PayU credentials) are configured directly in `server.js` for self-hosted deployments.
 
 ---
 
 ## API
 
-InvoiceAI exposes a REST API for invoice parsing. Full interactive documentation is available at `/docs.html`.
+InvoiceAI exposes a REST API for programmatic invoice parsing.
 
-### Parse Endpoint
+### Authentication
 
-```http
-POST /api/parse/text
-Authorization: Bearer <api_key>
-Content-Type: application/json
+Include your API key in the `x-api-key` header:
 
-{
-  "text": "INVOICE #INV-2024-001\nDate: 2024-03-15\n\nItem A  x2   $50.00\nItem B  x1   $30.00\n\nSubtotal    $130.00\nTax (10%)   $13.00\nTotal       $143.00\n\nVendor: Acme Corp\nClient: Jane Doe"
-}
+```bash
+curl -X POST https://your-host.com/api/parse \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: iai_your_api_key_here" \
+  -d '{"text": "Invoice INV-001 dated 2024-01-15 from ABC Corp..."}'
 ```
 
-**Response:**
+### Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/parse` | Parse invoice from raw text |
+| `POST` | `/api/parse/url` | Parse invoice from a PDF URL |
+| `POST` | `/api/parse/file` | Parse invoice from an uploaded file |
+| `GET` | `/api/demo` | Demo endpoint (no auth required) |
+| `GET` | `/api/health` | Health check |
+
+### Response Format
+
+All endpoints return JSON:
 
 ```json
 {
-  "invoiceNumber": "INV-2024-001",
-  "date": "2024-03-15",
-  "dueDate": null,
-  "vendor": { "name": "Acme Corp" },
-  "client": { "name": "Jane Doe" },
-  "lineItems": [
-    { "description": "Item A", "quantity": 2, "unitPrice": 50, "total": 100 },
-    { "description": "Item B", "quantity": 1, "unitPrice": 30, "total": 30 }
-  ],
-  "subtotal": 130,
-  "tax": 13,
-  "total": 143,
-  "currency": "USD"
+  "success": true,
+  "data": {
+    "invoice_number": "INV-001",
+    "date": "2024-01-15",
+    "due_date": "2024-02-14",
+    "vendor": { "name": "ABC Corp" },
+    "client": { "name": "Client Name" },
+    "line_items": [],
+    "subtotal": 1000,
+    "tax": 100,
+    "total": 1100,
+    "currency": "USD",
+    "confidence": 0.95
+  }
 }
 ```
 
-See the [API Documentation](docs.html) for all available endpoints: `POST /parse/text`, `POST /parse/url`, `POST /parse/file`, `GET /demo`, `GET /health`.
+> Full API documentation is available at [`/docs`](docs.html) when the server is running.
+
+---
+
+## Authentication
+
+### Email / Password
+
+Users can sign up with email and password. Passwords are hashed with bcrypt. Session JWTs expire after 7 days.
+
+### Google Sign-In
+
+InvoiceAI uses **Google Identity Services** (GIS) for one-tap sign-in. The flow:
+
+1. Frontend loads Google's GIS library and renders the sign-in button.
+2. Google returns a credential JWT with user profile info.
+3. Backend verifies the credential and either creates a new user or signs in an existing one.
+4. The client receives a session JWT and API key.
+
+#### Configuration
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com).
+2. Create a project → **APIs & Services → Credentials**.
+3. Create an **OAuth 2.0 Client ID** (Web application).
+4. Add your domain to **Authorized JavaScript origins**.
+5. Set `GOOGLE_CLIENT_ID` in the frontend (see `signup.html`).
+
+---
+
+## Subscription Plans
+
+InvoiceAI offers tiered subscription billing via PayU:
+
+| Plan | Price | API Calls | Rate Limit |
+|---|---|---|---|
+| **Free** | ₹0 | 500 req/mo | 10 req/min |
+| **Starter** | ₹999/mo | 5,000 req/mo | 60 req/min |
+| **Business** | ₹2,499/mo | 15,000 req/mo | 120 req/min |
+| **Enterprise** | ₹7,999/mo | Unlimited | Custom |
+
+---
+
+## Deployment
+
+### Railway (Recommended)
+
+The project includes a [`railway.json`](railway.json) configuration for easy deployment:
+
+```bash
+# Install Railway CLI
+npm i -g @railway/cli
+
+# Deploy
+railway login
+railway up
+```
+
+### Self-Hosted
+
+```bash
+npm install
+cp .env.example .env
+# Configure environment variables
+npm start
+```
 
 ---
 
 ## Project Structure
 
 ```
-├── public/                  # Frontend assets
+invoiceai/
+├── db/
+│   ├── init.js              # Database initialization & schema
+│   └── invoiceai.db         # SQLite database file
+├── docs/                    # Frontend HTML pages
 │   ├── index.html           # Landing page
 │   ├── demo.html            # Interactive live demo
-│   ├── docs.html            # API documentation
-│   ├── dashboard.html       # User dashboard (auth required)
-│   ├── signup.html          # Sign-in / sign-up
+│   ├── signup.html          # Sign-in / sign-up page
+│   ├── dashboard.html       # User dashboard
+│   └── docs.html            # API documentation
+├── public/
 │   ├── css/
 │   │   └── style.css        # Global stylesheet
 │   ├── js/
 │   │   ├── main.js          # Landing page interactivity
-│   │   ├── signup.js        # Auth (email + Google sign-in)
-│   │   ├── dashboard.js     # Dashboard, API keys, PayU payments
-│   │   └── demo.js          # Demo page parser
-│   └── img/                 # Images and icons
-├── db/
-│   └── init.js              # SQLite schema and initialization
-├── docs/                    # Duplicate of public/ for alternate static hosting
-├── server.js                # Express backend — routes, auth, parsing, payments
+│   │   ├── demo.js          # Demo page logic
+│   │   ├── signup.js        # Auth flow (email + Google)
+│   │   └── dashboard.js     # Dashboard & API key management
+│   └── img/                 # Image assets
+├── server.js                # Express server — routes, middleware, logic
 ├── package.json
-├── railway.json             # Railway deployment config
-└── .env.example             # Environment template
+├── .env.example             # Environment variable template
+└── railway.json             # Railway deployment config
 ```
 
 ---
 
-## Deployment
+## Contributing
 
-The project is configured for deployment on **Railway** via `railway.json` (Nixpacks builder). Deploy by connecting your GitHub repository to Railway — the `start` command is `node server.js`.
+Contributions are welcome! Here's how to get started:
 
-For other platforms, ensure:
-- Node.js >= 18 runtime
-- Environment variables set (see [Environment Variables](#environment-variables))
-- PayU URLs updated from `test.payu.in` to `secure.payu.in` for production
+1. **Fork** the repository.
+2. **Create a feature branch:** `git checkout -b feat/your-feature`.
+3. **Commit your changes:** `git commit -m "feat: add your feature"`.
+4. **Push to the branch:** `git push origin feat/your-feature`.
+5. **Open a Pull Request.**
+
+Please ensure your code follows the existing style and that the server starts without errors.
+
+### Development Tips
+
+- Use `npm run dev` for auto-restart on file changes.
+- SQLite database is created automatically on first run.
+- For PayU testing, use test mode credentials from the PayU dashboard.
 
 ---
 
 ## License
 
-Proprietary — All rights reserved.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
 <div align="center">
+  <sub>Built with ⟡ for small businesses, freelancers, and accountants who deserve better tools.</sub>
   <br/>
-  <p>
-    <strong>⟡ InvoiceAI</strong> — Stop typing invoices. Let AI do it in seconds.
-  </p>
   <br/>
+  <sub>Product ID: opp-001</sub>
 </div>
